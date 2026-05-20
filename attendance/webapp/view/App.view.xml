@@ -1,0 +1,142 @@
+<mvc:View controllerName="com.krones.attendancecalc.attendance.controller.App"
+    xmlns:mvc="sap.ui.core.mvc"   xmlns:viz="sap.viz.ui5.controls" 
+    xmlns="sap.m" xmlns:viz.feeds="sap.viz.ui5.controls.common.feeds"	xmlns:core="sap.ui.core"	xmlns:l="sap.ui.layout"
+	xmlns:f="sap.ui.layout.form" xmlns:u="sap.ui.unified" xmlns:viz.data="sap.viz.ui5.data" >
+    <Page id="page"  class="sapUiSizeCompact" showHeader="false">
+<content>
+<l:Splitter height="500px">
+			<VBox class="sapUiSmallMargin">
+		<f:SimpleForm id="SimpleFormDisplay354"
+			editable="false"
+			layout="ResponsiveGridLayout"
+			title="Attendance Data"
+			labelSpanXL="3"
+			labelSpanL="3"
+			labelSpanM="3"
+			labelSpanS="12"
+			adjustLabelSpan="false"
+			emptySpanXL="4"
+			emptySpanL="4"
+			emptySpanM="4"
+			emptySpanS="0"
+			columnsXL="1"
+			columnsL="1"
+			columnsM="1"
+			singleContainerFullSize="false" >
+			<f:content>
+			
+				<Label text="{i18n>Quarter}" required="true" />
+					<Select id="QuarterSelect" items="{InputModel>/TotalDays}" selectedKey="{InputModel>/Quarter}" change="onQuarterChange" forceSelection="false" showSecondaryValues="true" >
+						<core:ListItem key="{InputModel>Quarter}" text="{InputModel>Quarter}" additionalText="{InputModel>Text}" />
+						
+					</Select>
+					<Label text="{i18n>Date}"  required="true"/>
+                <DatePicker dateValue="{InputModel>/Date}" editable="false"  />
+				<Label text="{i18n>DaysWorked}"  required="true"/>
+                <Input value="{InputModel>/DaysWorked}"  description="Days"/>
+                <Label text="{i18n>OptionalHoliday}"  required="true" />
+				<Input value="{InputModel>/OptionalHoliday}"  description="Days"/>
+                <Label text="{i18n>LeaveTaken}" required="true"  />
+			    <Input value="{InputModel>/LeaveTaken}"   description="Days"/>
+                 <Label text="" />
+                 <Button text="{i18n>LoadData}"  type="Emphasized" icon="sap-icon://employee-approvals" press="onLoadData" />
+			</f:content>
+		</f:SimpleForm>
+       
+				<layoutData>
+					<l:SplitterLayoutData size="400px" />
+				</layoutData>
+			  </VBox>
+			<VBox>
+             <l:FixFlex id='chartFixFlex' class="sapUiSmallMargin" minFlexSize="250">
+        <!--Below is the setting panel -->
+        <l:fixContent>
+            
+        </l:fixContent>
+        <l:flexContent  >
+            <viz:VizFrame id="idVizFrame" uiConfig="{applicationSet:'fiori'}"
+                height='460px' width="100%" vizType='pie'  vizProperties="{
+        title: {
+            text: 'Attendance Overview',
+            visible: true
+        }
+    }" >
+                <viz:dataset>
+                    <viz.data:FlattenedDataset data="{/CalculationData}">
+                        <viz.data:dimensions>
+                            <viz.data:DimensionDefinition name="Desc"
+                                value="{Desc}" />
+                        </viz.data:dimensions>
+                        <viz.data:measures>
+                            <viz.data:MeasureDefinition name="Days"
+                                value="{Days}" />
+                        </viz.data:measures>
+                    </viz.data:FlattenedDataset>
+                </viz:dataset>
+
+                <viz:feeds>
+                    <viz.feeds:FeedItem uid="size" type="Measure"
+                        values="Days" />
+                    <viz.feeds:FeedItem uid="color" type="Dimension"
+                        values="Desc" />
+                </viz:feeds>
+                <viz:dependents>
+                    <viz:Popover id="idPopOver"></viz:Popover>
+                </viz:dependents>
+            </viz:VizFrame>
+        </l:flexContent>
+    </l:FixFlex>
+				<layoutData>
+					<l:SplitterLayoutData size="auto" />
+				</layoutData>
+			</VBox>
+		</l:Splitter>
+
+        <VBox class="sapUiSmallMarginBegin sapUiSmallMarginEnd">
+        	<Table id="idHolidayListTable"
+		inset="false"
+		items="{
+			path: 'Holidays>/MandatoryHolidays'
+		}">
+		<headerToolbar>
+			<OverflowToolbar>
+				<content>
+					<Title text="Holiday List" level="H2"/>
+					<ToolbarSpacer />
+						
+				</content>
+			</OverflowToolbar>
+		</headerToolbar>
+		<infoToolbar>
+			<OverflowToolbar>
+				<Label text="No of Holidays on Months"/>
+			</OverflowToolbar>
+		</infoToolbar>
+		<columns>
+			<Column
+				minScreenWidth="Tablet"
+				demandPopin="true">
+				<Text text="Month" />
+			</Column>
+			<Column
+				minScreenWidth="Tablet"
+				demandPopin="true">
+				<Text text="No of Days" />
+			</Column>
+		</columns>
+		<items>
+			<ColumnListItem vAlign="Middle">
+				<cells>
+					<Text
+						text="{Holidays>Month}" />
+					<Text
+						text="{Holidays>Days}" />
+				</cells>
+			</ColumnListItem>
+		</items>
+	</Table>
+	</VBox>
+</content>
+   
+    </Page>
+</mvc:View>

@@ -1,0 +1,24 @@
+{
+  "generationParameters": {
+    "generationDate": "Wed Nov 19 2025 06:29:02 GMT+0000 (Coordinated Universal Time)",
+    "generatorPlatform": "SAP Business Application Studio",
+    "serviceType": "None",
+    "metadataFilename": "",
+    "serviceUrl": "N/A",
+    "appName": "attendance",
+    "appTitle": "Attendance Calculation",
+    "appDescription": "Attendance Calculation",
+    "appNamespace": "com.krones.attendancecalc",
+    "ui5Theme": "sap_horizon",
+    "ui5Version": "1.142.1",
+    "enableCodeAssist": false,
+    "enableEslint": false,
+    "enableTypeScript": false,
+    "showMockDataInfo": false,
+    "generatorVersion": "1.19.5",
+    "template": "Basic",
+    "generatorName": "SAP Fiori Application Generator",
+    "entityRelatedConfig": [],
+    "launchText": "To launch the generated application, run the following from the generated application root folder:\n\n```\n    npm start\n```"
+  }
+}
