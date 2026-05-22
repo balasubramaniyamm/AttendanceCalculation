@@ -29,15 +29,15 @@
 					<Select id="QuarterSelect" items="{InputModel>/TotalDays}" selectedKey="{InputModel>/Quarter}" change="onQuarterChange" forceSelection="false" showSecondaryValues="true" >
 						<core:ListItem key="{InputModel>Quarter}" text="{InputModel>Quarter}" additionalText="{InputModel>Text}" />
 						
-					</Select>
-					<Label text="{i18n>Date}"  required="true"/>
-                <DatePicker dateValue="{InputModel>/Date}" editable="false"  />
-				<Label text="{i18n>DaysWorked}"  required="true"/>
-                <Input value="{InputModel>/DaysWorked}"  description="Days"/>
-                <Label text="{i18n>OptionalHoliday}"  required="true" />
-				<Input value="{InputModel>/OptionalHoliday}"  description="Days"/>
+					</Select> 
                 <Label text="{i18n>LeaveTaken}" required="true"  />
 			    <Input value="{InputModel>/LeaveTaken}"   description="Days"/>
+				<Label text="{i18n>OptionalHoliday}"  required="true" />
+				<Input value="{InputModel>/OptionalHoliday}"  description="Days"/>
+				<Label text="{i18n>DaysWorked}"  required="true"/>
+                <Input value="{InputModel>/DaysWorked}"  description="Days"/>
+				<Label text="{i18n>MyWorkingDays}"  required="true"/>
+                <Input value="{InputModel>/MyWorkingDays}" editable="false"  description="Days"/>
                  <Label text="" />
                  <Button text="{i18n>LoadData}"  type="Emphasized" icon="sap-icon://employee-approvals" press="onLoadData" />
 			</f:content>
