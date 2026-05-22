@@ -9,7 +9,7 @@
 		<f:SimpleForm id="SimpleFormDisplay354"
 			editable="false"
 			layout="ResponsiveGridLayout"
-			title="Attendance Data"
+			title="{i18n>AttendanceData}"
 			labelSpanXL="3"
 			labelSpanL="3"
 			labelSpanM="3"
@@ -23,6 +23,15 @@
 			columnsL="1"
 			columnsM="1"
 			singleContainerFullSize="false" >
+			
+           <f:toolbar>
+            <OverflowToolbar>
+                <Title text="{i18n>AttendanceData}" />
+                <ToolbarSpacer />
+               <Button text="{i18n>LoadData}"  type="Emphasized" icon="sap-icon://arrow-right" press="onLoadData" />
+			 </OverflowToolbar>
+            </f:toolbar>
+        
 			<f:content>
 			
 				<Label text="{i18n>Quarter}" required="true" />
@@ -36,11 +45,11 @@
 				<Input value="{InputModel>/OptionalHoliday}"  description="Days"/>
 				<Label text="{i18n>DaysWorked}"  required="true"/>
                 <Input value="{InputModel>/DaysWorked}"  description="Days"/>
-				<Label text="{i18n>MyWorkingDays}"  required="true"/>
+				<Label text="{i18n>MyWorkingDays}"  />
                 <Input value="{InputModel>/MyWorkingDays}" editable="false"  description="Days"/>
-                 <Label text="" />
-                 <Button text="{i18n>LoadData}"  type="Emphasized" icon="sap-icon://employee-approvals" press="onLoadData" />
-			</f:content>
+				<Label text="{i18n>OfficeBalanceDays}"  />
+                <Input value="{InputModel>/OfficeBalanceDays}" editable="false"  description="Days"/>
+                </f:content>
 		</f:SimpleForm>
        
 				<layoutData>

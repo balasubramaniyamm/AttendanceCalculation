@@ -11,6 +11,7 @@ sap.ui.define([
                 LeaveTaken: 0,
                 MyWorkingDays: 0,
                 Date: new Date(),
+                OfficeBalanceDays: 0,
                 Quarter: "",
                 TotalDays: [
                     {
@@ -188,6 +189,7 @@ sap.ui.define([
             }
             var oAttendanceModel = new sap.ui.model.json.JSONModel(aAttendanceCalculationData);
             this.getView().getModel("InputModel").setProperty("/MyWorkingDays", myWorkingDays);
+            this.getView().getModel("InputModel").setProperty("/OfficeBalanceDays", this.calculateOfficeBalanceDaysForQuarter(myWorkingDays, oInputData.DaysWorked));
             this.oVizFrame.setModel(oAttendanceModel);
 
         },
@@ -211,7 +213,10 @@ sap.ui.define([
                 current.setDate(current.getDate() + 1);
             }
             return weekdayCount;
-        }
+        },
+       calculateOfficeBalanceDaysForQuarter: function (MyWorkingDays, InOfficeDays) {
+    return Math.round((50 * MyWorkingDays / 100) - InOfficeDays);
+}
         
     });
 });
