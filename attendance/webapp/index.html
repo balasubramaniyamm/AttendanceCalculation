@@ -5,20 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>Attendance Calculation</title>
-    <style>
-        html, body, body > div, #container, #container-uiarea {
-            height: 100%;
-        }
-    </style>
+   <style>
+    html, body, #content, #container, #container-uiarea {
+        height: 100% !important;
+        width: 100% !important;
+        margin: 0;
+    }
+</style>
 
     <script
         id="sap-ui-bootstrap"
-        src="https://ui5.sap.com/1.120.17/resources/sap-ui-core.js"
+        src="https://ui5.sap.com/resources/sap-ui-core.js"
         data-sap-ui-theme="sap_horizon"
         data-sap-ui-resource-roots='{
             "com.krones.attendancecalc.attendance": "./"
         }'
-        data-sap-ui-on-init="module:sap/ui/core/ComponentSupport"
+      
+        data-sap-ui-oninit="module:sap/ui/core/ComponentSupport"
         data-sap-ui-compat-version="edge"
         data-sap-ui-async="true"
         data-sap-ui-frame-options="trusted"
