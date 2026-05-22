@@ -9,6 +9,7 @@ sap.ui.define([
                 DaysWorked: 0,
                 OptionalHoliday: 0,
                 LeaveTaken: 0,
+                MyWorkingDays: 0,
                 Date: new Date(),
                 Quarter: "",
                 TotalDays: [
@@ -169,6 +170,7 @@ sap.ui.define([
             var mandatoryHolidays = this.getView().getModel("Holidays").getProperty("/MandatoryHolidays").filter(item => item.Quarter === oInputData.Quarter).reduce((acc, item) => acc + item.Days, 0);
             var ototalWeekDays = this.calculateWeekdaysInQuarter(dateObj);
             var remainingDays = ototalWeekDays - oInputData.DaysWorked - oInputData.LeaveTaken - mandatoryHolidays - oInputData.OptionalHoliday;
+           var myWorkingDays = ototalWeekDays  - oInputData.LeaveTaken - mandatoryHolidays - oInputData.OptionalHoliday;
             var aAttendanceCalculationData = {
                 CalculationData: [
 
@@ -185,6 +187,7 @@ sap.ui.define([
                 ]
             }
             var oAttendanceModel = new sap.ui.model.json.JSONModel(aAttendanceCalculationData);
+            this.getView().getModel("InputModel").setProperty("/MyWorkingDays", myWorkingDays);
             this.oVizFrame.setModel(oAttendanceModel);
 
         },
