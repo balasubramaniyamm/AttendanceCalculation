@@ -7,7 +7,10 @@ sap.ui.define([
 
     return Controller.extend("com.krones.attendancecalc.attendance.controller.App", {
         onInit() {
-            var oInputData = {
+            this.onInitialLoad();   
+        },
+        onInitialLoad: function () {
+              var oInputData = {
                 DaysWorked: 0,
                 OptionalHoliday: 0,
                 LeaveTaken: 0,
@@ -46,72 +49,6 @@ sap.ui.define([
             }
             var oInputModel = new sap.ui.model.json.JSONModel(oInputData);
             this.getView().setModel(oInputModel, "InputModel");
-            var aHolidayList = {
-                "MandatoryHolidays": [
-                    {
-                        "Month": "January",
-                        "Quarter": "Q1",
-                        "Days": 2
-                    },
-                    {
-                        "Month": "February",
-                        "Quarter": "Q1",
-                        "Days": 0
-                    },
-                    {
-                        "Month": "March",
-                        "Quarter": "Q1",
-                        "Days": 0
-                    },
-                    {
-                        "Month": "April",
-                        "Quarter": "Q2",
-                        "Days": 1
-                    },
-                    {
-                        "Month": "May",
-                        "Quarter": "Q2",
-                        "Days": 1
-                    },
-                    {
-                        "Month": "June",
-                        "Quarter": "Q2",
-                        "Days": 0
-                    },
-                    {
-                        "Month": "July",
-                        "Quarter": "Q3",
-                        "Days": 0
-                    },
-                    {
-                        "Month": "August",
-                        "Quarter": "Q3",
-                        "Days": 1
-                    },
-                    {
-                        "Month": "September",
-                        "Quarter": "Q3",
-                        "Days": 0
-                    },
-                    {
-                        "Month": "October",
-                        "Quarter": "Q4",
-                        "Days": 2
-                    },
-                    {
-                        "Month": "November",
-                        "Quarter": "Q4",
-                        "Days": 0
-                    },
-                    {
-                        "Month": "December",
-                        "Quarter": "Q4",
-                        "Days": 1
-                    }
-                ],
-
-            };
-            //    var oModel = new sap.ui.model.json.JSONModel(aHolidayList);
             var oModel = new sap.ui.model.json.JSONModel({});
             this.getView().setModel(oModel, "Holidays");
             var aAttendanceCalculationData = {
@@ -160,6 +97,7 @@ sap.ui.define([
             this._openDB();
           
 
+       
         },
 
         onQuarterChange: function (oEvent) {
