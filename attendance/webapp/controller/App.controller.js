@@ -1,8 +1,9 @@
 sap.ui.define([
     "sap/ui/core/mvc/Controller",
     "sap/m/MessageToast",
-    "sap/ui/model/json/JSONModel"
-], (Controller, MessageToast, JSONModel) => {
+    "sap/ui/model/json/JSONModel",
+    "sap/ui/export/Spreadsheet"
+], (Controller, MessageToast, JSONModel, Spreadsheet) => {
     "use strict";
 
     return Controller.extend("com.krones.attendancecalc.attendance.controller.App", {
@@ -507,7 +508,43 @@ sap.ui.define([
             request.onerror = () => {
                 MessageToast.show("Delete failed");
             };
+        },
+         onExportExcel: function () {
+            // 1. Get the table reference and its JSON model binding path
+            var oTable = this.byId("UserHistoryTable");
+            var oBinding = oTable.getBinding("items");
+            var oModel = oTable.getModel("AttendanceHistory"); // Use your actual model name
+            
+            // 2. Define the Excel columns matching your data properties
+            var aColumns = [
+                { label: "Date", property: "Date", type: "string" },
+                { label: "Quarter", property: "Quarter", type: "string" },
+                { label: "OptionalHoliday", property: "OptionalHoliday", type: "string" },
+                 { label: "Percentage", property: "Percentage", type: "string" },
+                  { label: "OptionalHoliday", property: "OptionalHoliday", type: "string" },
+                   { label: "LeaveTaken", property: "LeaveTaken", type: "string" }
+            ];
+          
+
+            // 3. Define spreadsheet configuration settings
+            var oSettings = {
+                workbook: { columns: aColumns },
+                dataSource: oModel.getProperty(oBinding.getPath()), // Extracts raw data array from the JSON model
+                fileName: "Attendance_History.xlsx",
+                worker: false // Set to false to avoid web-worker cross-origin issues in local environments
+            };
+
+            // 4. Initialize and trigger the download
+            var oSheet = new Spreadsheet(oSettings);
+            oSheet.build()
+                .then(function () {
+                    sap.m.MessageToast.show("Excel downloaded successfully!");
+                })
+                .finally(function () {
+                    oSheet.destroy(); // Always clean up the object to free up memory
+                });
         }
+
 
     });
 });

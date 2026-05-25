@@ -176,7 +176,7 @@
 					<Button text="Refresh"  type="Emphasized" icon="sap-icon://refresh" press="onLoadFromATHistory" />
 					
 			<Button text="{i18n>SaveData}"  type="Emphasized" icon="sap-icon://save" press="onSaveAttendanceHistory" />
-			
+			<Button icon="sap-icon://excel-attachment" press="onExportExcel" text="Export to Excel" type="Emphasized" />
 			</OverflowToolbar>
 		</infoToolbar>
 		<columns>
