@@ -1,7 +1,8 @@
 sap.ui.define([
     "sap/ui/core/mvc/Controller",
-    "sap/m/MessageToast"
-], (Controller, MessageToast) => {
+    "sap/m/MessageToast",
+    "sap/ui/model/json/JSONModel"
+], (Controller, MessageToast, JSONModel) => {
     "use strict";
 
     return Controller.extend("com.krones.attendancecalc.attendance.controller.App", {
@@ -157,9 +158,10 @@ sap.ui.define([
             // Apply the updated properties
             this.oVizFrame.setVizProperties(oVizProperties);
             this._openDB();
-            
+          
+
         },
-      
+
         onQuarterChange: function (oEvent) {
             var selectedQuarter = oEvent.getSource().getSelectedKey();
             this.getView().getModel("InputModel").setProperty("/Quarter", selectedQuarter);
@@ -198,6 +200,7 @@ sap.ui.define([
             this.getView().getModel("InputModel").setProperty("/OfficeBalanceDays", this.calculateOfficeBalanceDaysForQuarter(myWorkingDays, oInputData.DaysWorked));
             this.oVizFrame.setModel(oAttendanceModel);
 
+
         },
         calculateWeekdaysInQuarter: function (date) {
             var year = date.getFullYear();
@@ -226,6 +229,52 @@ sap.ui.define([
         onEditHolidays: function () {
             this.getView().getModel("InputModel").setProperty("/IsEditable", true);
         },
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         // -------------------------------
         // IndexedDB Initialize
         // -------------------------------
@@ -244,8 +293,8 @@ sap.ui.define([
 
                 request.onsuccess = (event) => {
                     this.db = event.target.result;
-                    MessageToast.show("IndexedDB initialized successfully");
-                     this.onLoadFromLocalDB(); 
+                    MessageToast.show("DB initialized successfully");
+                    this.onLoadFromLocalDB();
                 };
 
                 request.onerror = () => {
@@ -263,21 +312,10 @@ sap.ui.define([
                     return;
                 }
 
-                // Example data from input fields
-                var name = "Balasubramaniyam"
-                var age = 32
-
-                if (!name || !age) {
-                    MessageToast.show("Enter valid data");
-                    return;
-                }
-
                 var tx = this.db.transaction("TableData", "readwrite");
                 var store = tx.objectStore("TableData");
-
-
-                var aHolidayList = 
-                   [
+                var aHolidayList =
+                    [
                         {
                             "Month": "January",
                             "Quarter": "Q1",
@@ -340,12 +378,12 @@ sap.ui.define([
                         }
                     ];
 
-            
+
                 //   var aHolidayList = this.getView().getModel("Holidays").getProperty("/MandatoryHolidays");
                 store.add({ "MandatoryHolidays": aHolidayList });
 
 
-                tx.oncomplete = () => MessageToast.show("Saved to local DB");
+                tx.oncomplete = () => MessageToast.show("Saved to DB");
                 tx.onerror = () => MessageToast.show("Save failed");
             } catch (e) {
                 console.error(e);
@@ -362,6 +400,7 @@ sap.ui.define([
                 // Bind to UI5 table
                 var aHolidayList = data[0];
                 this.getView().getModel("Holidays").setProperty("/MandatoryHolidays", aHolidayList.MandatoryHolidays);
+                this.getView().getModel("Holidays").setProperty("/ID", aHolidayList.id);
 
 
             };
@@ -407,16 +446,16 @@ sap.ui.define([
 
                 // CRITICAL: Ensure the target "id" matches your existing row exactly
                 var updatedPayload = {
-                    "id": 11,
+                    "id": this.getView().getModel("Holidays").getProperty("/ID"),
                     "MandatoryHolidays": this.getView().getModel("Holidays").getProperty("/MandatoryHolidays")
 
                 };
 
                 // put() updates the existing item because the "id" already exists
                 var request = store.put(updatedPayload);
-           //     request.onsuccess = () => MessageToast.show("Data Updated successfully");
+                //     request.onsuccess = () => MessageToast.show("Data Updated successfully");
                 request.onsuccess = (event) => {
-                    this.db = event.target.result;
+                   // this.db = event.target.result;
                     MessageToast.show("Data Updated successfully");
                     this.getView().getModel("InputModel").setProperty("/IsEditable", false);
 

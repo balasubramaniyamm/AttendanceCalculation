@@ -8,10 +8,15 @@
     "sapui5"
   ],
   "main": "webapp/index.html",
-  "dependencies": {},
+  "dependencies": {
+    "pouchdb": "^9.0.0",
+    "pouchdb-browser": "^9.0.0",
+    "sql.js": "^1.14.1",
+    "sqlite3": "^6.0.1"
+  },
   "devDependencies": {
-    "@ui5/cli": "^4.0.16",
-    "@sap/ux-ui5-tooling": "1"
+    "@sap/ux-ui5-tooling": "1",
+    "@ui5/cli": "^4.0.16"
   },
   "scripts": {
     "start": "fiori run --open \"test/flp.html#app-preview\"",
