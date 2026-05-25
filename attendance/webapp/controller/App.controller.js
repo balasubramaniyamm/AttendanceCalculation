@@ -326,6 +326,7 @@ sap.ui.define([
                  tx.oncomplete = (event) => {
                MessageToast.show("Data fetched Successfully");
                this.onLoadFromLocalDB();
+                this.getView().getModel("InputModel").setProperty("/IsEditable", false);
 
             };
                 tx.onerror = () => MessageToast.show("Save failed");
