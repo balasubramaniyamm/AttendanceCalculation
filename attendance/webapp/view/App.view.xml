@@ -119,6 +119,13 @@
 		<infoToolbar>
 			<OverflowToolbar>
 				<Label text="No of Holidays on Months"/>
+				<ToolbarSpacer ></ToolbarSpacer>
+				<Button text="Edit"  type="Emphasized" icon="sap-icon://edit" press="onEditHolidays" />
+				<Button press="onLoadFromLocalDB" text="{i18n>LoadFromLocalDB}"  type="Emphasized" icon="sap-icon://database"  enabled="{= !!${InputModel>/IsEditable} }"/>
+				<Button press="onSaveToLocalDB" text="{i18n>SaveToLocalDB}"  type="Emphasized" icon="sap-icon://save" enabled="{= !!${InputModel>/IsEditable} }" />
+				<Button press="onDeleteFromLocalDB" text="{i18n>Delete}"  type="Emphasized" icon="sap-icon://delete" enabled="{= !!${InputModel>/IsEditable} }" />
+				<Button press="onUpdateEntry" text="{i18n>UpdateEntry}"  type="Emphasized" icon="sap-icon://edit" enabled="{= !!${InputModel>/IsEditable} }"  />
+			
 			</OverflowToolbar>
 		</infoToolbar>
 		<columns>
@@ -138,8 +145,8 @@
 				<cells>
 					<Text
 						text="{Holidays>Month}" />
-					<Text
-						text="{Holidays>Days}" />
+					<Input
+						value="{Holidays>Days}" editable="{= !!${InputModel>/IsEditable} }" width="20%" type="Number"/>
 				</cells>
 			</ColumnListItem>
 		</items>

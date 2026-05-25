@@ -1,6 +1,7 @@
 sap.ui.define([
-    "sap/ui/core/mvc/Controller"
-], (Controller) => {
+    "sap/ui/core/mvc/Controller",
+    "sap/m/MessageToast"
+], (Controller, MessageToast) => {
     "use strict";
 
     return Controller.extend("com.krones.attendancecalc.attendance.controller.App", {
@@ -13,6 +14,7 @@ sap.ui.define([
                 Date: new Date(),
                 OfficeBalanceDays: 0,
                 Quarter: "",
+                IsEditable: false,
                 TotalDays: [
                     {
                         Quarter: "Q1",
@@ -108,7 +110,8 @@ sap.ui.define([
                 ],
 
             };
-            var oModel = new sap.ui.model.json.JSONModel(aHolidayList);
+            //    var oModel = new sap.ui.model.json.JSONModel(aHolidayList);
+            var oModel = new sap.ui.model.json.JSONModel({});
             this.getView().setModel(oModel, "Holidays");
             var aAttendanceCalculationData = {
                 CalculationData: [
@@ -153,7 +156,10 @@ sap.ui.define([
 
             // Apply the updated properties
             this.oVizFrame.setVizProperties(oVizProperties);
+            this._openDB();
+            
         },
+      
         onQuarterChange: function (oEvent) {
             var selectedQuarter = oEvent.getSource().getSelectedKey();
             this.getView().getModel("InputModel").setProperty("/Quarter", selectedQuarter);
@@ -168,10 +174,10 @@ sap.ui.define([
             var dateObj = this.getView().getModel("InputModel").getProperty("/Date");
             var year = dateObj.getUTCFullYear();
             var totalDays = oInputData.TotalDays.find(item => item.Quarter === oInputData.Quarter).Days;
-            var mandatoryHolidays = this.getView().getModel("Holidays").getProperty("/MandatoryHolidays").filter(item => item.Quarter === oInputData.Quarter).reduce((acc, item) => acc + item.Days, 0);
+            var mandatoryHolidays = this.getView().getModel("Holidays").getProperty("/MandatoryHolidays").filter(item => item.Quarter === oInputData.Quarter).reduce((acc, item) => acc + parseInt(item.Days, 0), 0);
             var ototalWeekDays = this.calculateWeekdaysInQuarter(dateObj);
             var remainingDays = ototalWeekDays - oInputData.DaysWorked - oInputData.LeaveTaken - mandatoryHolidays - oInputData.OptionalHoliday;
-           var myWorkingDays = ototalWeekDays  - oInputData.LeaveTaken - mandatoryHolidays - oInputData.OptionalHoliday;
+            var myWorkingDays = ototalWeekDays - oInputData.LeaveTaken - mandatoryHolidays - oInputData.OptionalHoliday;
             var aAttendanceCalculationData = {
                 CalculationData: [
 
@@ -214,9 +220,216 @@ sap.ui.define([
             }
             return weekdayCount;
         },
-       calculateOfficeBalanceDaysForQuarter: function (MyWorkingDays, InOfficeDays) {
-    return Math.round((50 * MyWorkingDays / 100) - InOfficeDays);
-}
-        
+        calculateOfficeBalanceDaysForQuarter: function (MyWorkingDays, InOfficeDays) {
+            return Math.round((50 * MyWorkingDays / 100) - InOfficeDays);
+        },
+        onEditHolidays: function () {
+            this.getView().getModel("InputModel").setProperty("/IsEditable", true);
+        },
+        // -------------------------------
+        // IndexedDB Initialize
+        // -------------------------------
+        _openDB: function () {
+            try {
+                const request = indexedDB.open("MyLocalDB", 1);
+
+                request.onupgradeneeded = (event) => {
+                    const db = event.target.result;
+
+                    // Create store only once
+                    if (!db.objectStoreNames.contains("TableData")) {
+                        db.createObjectStore("TableData", { keyPath: "id", autoIncrement: true });
+                    }
+                };
+
+                request.onsuccess = (event) => {
+                    this.db = event.target.result;
+                    MessageToast.show("IndexedDB initialized successfully");
+                     this.onLoadFromLocalDB(); 
+                };
+
+                request.onerror = () => {
+                    MessageToast.show("Failed to open IndexedDB");
+                };
+            } catch (e) {
+                console.error("IndexedDB not supported:", e);
+            }
+        },
+        onSaveToLocalDB: function () {
+            this.onDeleteFromLocalDB(); // Clear existing record before saving new data
+            try {
+                if (!this.db) {
+                    MessageToast.show("DB not ready");
+                    return;
+                }
+
+                // Example data from input fields
+                var name = "Balasubramaniyam"
+                var age = 32
+
+                if (!name || !age) {
+                    MessageToast.show("Enter valid data");
+                    return;
+                }
+
+                var tx = this.db.transaction("TableData", "readwrite");
+                var store = tx.objectStore("TableData");
+
+
+                var aHolidayList = 
+                   [
+                        {
+                            "Month": "January",
+                            "Quarter": "Q1",
+                            "Days": 2
+                        },
+                        {
+                            "Month": "February",
+                            "Quarter": "Q1",
+                            "Days": 0
+                        },
+                        {
+                            "Month": "March",
+                            "Quarter": "Q1",
+                            "Days": 0
+                        },
+                        {
+                            "Month": "April",
+                            "Quarter": "Q2",
+                            "Days": 1
+                        },
+                        {
+                            "Month": "May",
+                            "Quarter": "Q2",
+                            "Days": 1
+                        },
+                        {
+                            "Month": "June",
+                            "Quarter": "Q2",
+                            "Days": 0
+                        },
+                        {
+                            "Month": "July",
+                            "Quarter": "Q3",
+                            "Days": 0
+                        },
+                        {
+                            "Month": "August",
+                            "Quarter": "Q3",
+                            "Days": 1
+                        },
+                        {
+                            "Month": "September",
+                            "Quarter": "Q3",
+                            "Days": 0
+                        },
+                        {
+                            "Month": "October",
+                            "Quarter": "Q4",
+                            "Days": 2
+                        },
+                        {
+                            "Month": "November",
+                            "Quarter": "Q4",
+                            "Days": 0
+                        },
+                        {
+                            "Month": "December",
+                            "Quarter": "Q4",
+                            "Days": 1
+                        }
+                    ];
+
+            
+                //   var aHolidayList = this.getView().getModel("Holidays").getProperty("/MandatoryHolidays");
+                store.add({ "MandatoryHolidays": aHolidayList });
+
+
+                tx.oncomplete = () => MessageToast.show("Saved to local DB");
+                tx.onerror = () => MessageToast.show("Save failed");
+            } catch (e) {
+                console.error(e);
+            }
+        },
+        onLoadFromLocalDB: function () {
+            var tx = this.db.transaction("TableData", "readonly");
+            var store = tx.objectStore("TableData");
+            var request = store.getAll();
+
+            request.onsuccess = (event) => {
+                var data = event.target.result;
+
+                // Bind to UI5 table
+                var aHolidayList = data[0];
+                this.getView().getModel("Holidays").setProperty("/MandatoryHolidays", aHolidayList.MandatoryHolidays);
+
+
+            };
+
+            request.onerror = () => {
+                MessageToast.show("Load failed");
+            };
+        },
+        onDeleteFromLocalDB: function () {
+            try {
+                if (!this.db) {
+                    MessageToast.show("DB not ready");
+                    return;
+                }
+                // CRITICAL: Both strings must match your actual DB setup exactly
+                var storeName = "TableData"; // <-- CHANGE THIS to match DevTools exactly
+                var tx = this.db.transaction(storeName, "readwrite");
+                var store = tx.objectStore(storeName);
+
+                // var request = store.delete(id);
+                var request = store.clear();
+                request.onsuccess = function () {
+                    MessageToast.show("Record Cleared successfully");
+                };
+                request.onerror = function (event) {
+                    MessageToast.show("Delete failed: " + event.target.error.name);
+                };
+
+            } catch (error) {
+                console.error(error);
+                MessageToast.show("An error occurred");
+            }
+        },
+        onUpdateEntry: function () {
+            try {
+                if (!this.db) {
+                    MessageToast.show("DB not ready");
+                    return;
+                }
+
+                var tx = this.db.transaction("TableData", "readwrite");
+                var store = tx.objectStore("TableData");
+
+                // CRITICAL: Ensure the target "id" matches your existing row exactly
+                var updatedPayload = {
+                    "id": 11,
+                    "MandatoryHolidays": this.getView().getModel("Holidays").getProperty("/MandatoryHolidays")
+
+                };
+
+                // put() updates the existing item because the "id" already exists
+                var request = store.put(updatedPayload);
+           //     request.onsuccess = () => MessageToast.show("Data Updated successfully");
+                request.onsuccess = (event) => {
+                    this.db = event.target.result;
+                    MessageToast.show("Data Updated successfully");
+                    this.getView().getModel("InputModel").setProperty("/IsEditable", false);
+
+                };
+                request.onerror = () => MessageToast.show("Update failed");
+
+            } catch (e) {
+                console.error(e);
+            }
+        }
+        // -------------------------------
+        // IndexedDB Operations: Save, Load, Delete
+        // -------------------------------
+
     });
 });
