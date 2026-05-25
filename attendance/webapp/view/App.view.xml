@@ -29,7 +29,8 @@
                 <Title text="{i18n>AttendanceData}" />
                 <ToolbarSpacer />
                <Button text="{i18n>LoadData}"  type="Emphasized" icon="sap-icon://arrow-right" press="onLoadData" />
-			 </OverflowToolbar>
+			
+			</OverflowToolbar>
             </f:toolbar>
         
 			<f:content>
@@ -100,7 +101,7 @@
 				</layoutData>
 			</VBox>
 		</l:Splitter>
-
+<HBox>
         <VBox class="sapUiSmallMarginBegin sapUiSmallMarginEnd">
         	<Table id="idHolidayListTable"
 		inset="false"
@@ -121,11 +122,11 @@
 				<Label text="No of Holidays on Months"/>
 				<ToolbarSpacer ></ToolbarSpacer>
 				<Button text="Edit"  type="Emphasized" icon="sap-icon://edit" press="onEditHolidays" />
-				<Button press="onLoadFromLocalDB" text="{i18n>LoadFromLocalDB}"  type="Emphasized" icon="sap-icon://database"  enabled="{= !!${InputModel>/IsEditable} }"/>
+				<Button press="onLoadFromLocalDB" text="{i18n>Refresh}"  type="Emphasized" icon="sap-icon://refresh"  enabled="{= !!${InputModel>/IsEditable} }"/>
 				<Button press="onSaveToLocalDB" text="{i18n>SaveToLocalDB}"  type="Emphasized" icon="sap-icon://save" enabled="{= !!${InputModel>/IsEditable} }" />
 				<Button press="onDeleteFromLocalDB" text="{i18n>Delete}"  type="Emphasized" icon="sap-icon://delete" enabled="{= !!${InputModel>/IsEditable} }" />
 				<Button press="onUpdateEntry" text="{i18n>UpdateEntry}"  type="Emphasized" icon="sap-icon://edit" enabled="{= !!${InputModel>/IsEditable} }"  />
-			
+		
 			</OverflowToolbar>
 		</infoToolbar>
 		<columns>
@@ -152,6 +153,69 @@
 		</items>
 	</Table>
 	</VBox>
+
+  <VBox class="sapUiSmallMarginBegin sapUiSmallMarginEnd">
+        	<Table id="UserHistoryTable"
+		inset="false"
+		items="{
+			path: 'AttendanceHistory>/Data'
+		}">
+		<headerToolbar>
+			<OverflowToolbar>
+				<content>
+					<Title text="Attendance History" level="H2"/>
+					<ToolbarSpacer />
+						
+				</content>
+			</OverflowToolbar>
+		</headerToolbar>
+		<infoToolbar>
+			<OverflowToolbar>
+			<Label text="Your past attendance records will be shown here"/>
+				<ToolbarSpacer ></ToolbarSpacer>
+					<Button text="Refresh"  type="Emphasized" icon="sap-icon://refresh" press="onLoadFromATHistory" />
+					
+			<Button text="{i18n>SaveData}"  type="Emphasized" icon="sap-icon://save" press="onSaveAttendanceHistory" />
+			
+			</OverflowToolbar>
+		</infoToolbar>
+		<columns>
+			<Column
+				minScreenWidth="Tablet"
+				demandPopin="true">
+				<Text text="Date" />
+			</Column>
+			<Column
+				minScreenWidth="Tablet"
+				demandPopin="true">
+				<Text text="Percentage" />
+			</Column>
+			<Column
+				minScreenWidth="Tablet"
+				demandPopin="true">
+				<Text text="Delete" />
+			</Column>
+		</columns>
+		<items>
+			<ColumnListItem vAlign="Middle" type="Navigation" press="onUserHistoryItemPress">
+				<cells>
+					
+					<Text text="{
+    path: 'AttendanceHistory>Date',
+    type: 'sap.ui.model.type.DateTime',
+    formatOptions: {
+        pattern: 'dd-MMM-yyyy HH:mm'
+    }
+}"/>
+					<Text
+						text="{AttendanceHistory>Percentage} %" />
+						<Button icon="sap-icon://delete" type="Transparent" press="onDeleteHistoryItem"/>
+				</cells>
+			</ColumnListItem>
+		</items>
+	</Table>
+</VBox>
+	</HBox>
 </content>
    
     </Page>

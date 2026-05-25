@@ -295,6 +295,7 @@ sap.ui.define([
                     this.db = event.target.result;
                     MessageToast.show("DB initialized successfully");
                     this.onLoadFromLocalDB();
+                    this.onLoadFromATHistory();
                 };
 
                 request.onerror = () => {
@@ -380,7 +381,7 @@ sap.ui.define([
 
 
                 //   var aHolidayList = this.getView().getModel("Holidays").getProperty("/MandatoryHolidays");
-                store.add({ "MandatoryHolidays": aHolidayList });
+                store.add({ "MandatoryHolidays": aHolidayList ,Key:"HOLIDAYLIST" });
 
 
                 tx.oncomplete = () => MessageToast.show("Saved to DB");
@@ -398,9 +399,9 @@ sap.ui.define([
                 var data = event.target.result;
 
                 // Bind to UI5 table
-                var aHolidayList = data[0];
-                this.getView().getModel("Holidays").setProperty("/MandatoryHolidays", aHolidayList.MandatoryHolidays);
-                this.getView().getModel("Holidays").setProperty("/ID", aHolidayList.id);
+                var aHolidayList =  data.filter(item => item.Key === "HOLIDAYLIST");
+                this.getView().getModel("Holidays").setProperty("/MandatoryHolidays", aHolidayList[0].MandatoryHolidays);
+                this.getView().getModel("Holidays").setProperty("/ID", aHolidayList[0].id);
 
 
             };
@@ -465,10 +466,104 @@ sap.ui.define([
             } catch (e) {
                 console.error(e);
             }
-        }
+        },
         // -------------------------------
         // IndexedDB Operations: Save, Load, Delete
         // -------------------------------
+//Attendance History for User 
+ onSaveAttendanceHistory: function () {
+         
+            try {
+                if (!this.db) {
+                    MessageToast.show("DB not ready");
+                    return;
+                }
+
+                var tx = this.db.transaction("TableData", "readwrite");
+                var store = tx.objectStore("TableData");
+                var AttendanceData = this.getView().getModel("InputModel").getProperty("/");
+                var dateObj = new Date();
+                var totalDays = AttendanceData.TotalDays.find(item => item.Quarter === AttendanceData.Quarter).Days;
+                var mandatoryHolidays = this.getView().getModel("Holidays").getProperty("/MandatoryHolidays").filter(item => item.Quarter === AttendanceData.Quarter).reduce((acc, item) => acc + parseInt(item.Days, 0), 0);
+                var ototalWeekDays = this.calculateWeekdaysInQuarter(dateObj);
+                var remainingDays = AttendanceData.remainingDays
+              
+                var aAttendanceHistoryData = {
+                    "Date": dateObj,
+                    "Quarter": AttendanceData.Quarter,
+                    "MandatoryHolidays": mandatoryHolidays,
+                    "OptionalHoliday": AttendanceData.OptionalHoliday,
+                    "LeaveTaken": AttendanceData.LeaveTaken,
+                    "OfficeBalanceDays": AttendanceData.OfficeBalanceDays,
+                    "MyWorkingDays": AttendanceData.MyWorkingDays,
+                    "Percentage": Math.round((AttendanceData.DaysWorked / AttendanceData.MyWorkingDays) * 100),
+                    "Key":"ATHISTORY"
+                };
+                var request = store.add(aAttendanceHistoryData);
+                // tx.oncomplete = () => MessageToast.show("Saved to DB");
+                tx.oncomplete = (event) => {
+              
+MessageToast.show("Saved to DB");
+ this.onLoadFromATHistory(); // Refresh the history list after deletion
+
+            };
+            
+                tx.onerror = () => MessageToast.show("Save failed");
+            } catch (e) {
+                console.error(e);
+            }
+
+        },
+         onLoadFromATHistory: function () {
+            var tx = this.db.transaction("TableData", "readonly");
+            var store = tx.objectStore("TableData");
+            var request = store.getAll();
+
+            request.onsuccess = (event) => {
+                var data = event.target.result;
+
+                // Bind to UI5 table
+                var aHistory =  data.filter(item => item.Key === "ATHISTORY");
+                    var oAttendanceHistoryModel = new sap.ui.model.json.JSONModel({ Data: aHistory });
+                this.getView().setModel(oAttendanceHistoryModel, "AttendanceHistory");
+
+
+            };
+
+            request.onerror = () => {
+                MessageToast.show("Load failed");
+            };
+        },
+        onUserHistoryItemPress: function (oEvent) {
+            var oItem = oEvent.getSource();
+            var oContext = oItem.getBindingContext("AttendanceHistory");
+          
+            var oData = oContext.getObject();
+            this.getView().getModel("InputModel").setProperty("/Date", new Date(oData.Date));
+            this.getView().getModel("InputModel").setProperty("/Quarter", oData.Quarter);
+            this.getView().getModel("InputModel").setProperty("/OptionalHoliday", oData.OptionalHoliday);
+            this.getView().getModel("InputModel").setProperty("/LeaveTaken", oData.LeaveTaken);
+            this.getView().getModel("InputModel").setProperty("/MyWorkingDays", oData.MyWorkingDays);
+            this.getView().getModel("InputModel").setProperty("/OfficeBalanceDays", oData.OfficeBalanceDays);
+            this.getView().getModel("InputModel").setProperty("/DaysWorked", Math.round((oData.Percentage * oData.MyWorkingDays) / 100));
+            this.onLoadData();
+        },
+        onDeleteHistoryItem: function (oEvent) {
+            var oItem = oEvent.getSource();
+            var oContext = oItem.getBindingContext("AttendanceHistory");
+            var oData = oContext.getObject();
+            var tx = this.db.transaction("TableData", "readwrite");
+            var store = tx.objectStore("TableData");
+            var request = store.delete(oData.id);
+
+            request.onsuccess = () => {
+                MessageToast.show("Record deleted successfully");
+                this.onLoadFromATHistory(); // Refresh the history list after deletion
+            };
+            request.onerror = () => {
+                MessageToast.show("Delete failed");
+            };   
+        }       
 
     });
 });
