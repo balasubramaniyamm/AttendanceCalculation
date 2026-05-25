@@ -7,10 +7,10 @@ sap.ui.define([
 
     return Controller.extend("com.krones.attendancecalc.attendance.controller.App", {
         onInit() {
-            this.onInitialLoad();   
+            this.onInitialLoad();
         },
         onInitialLoad: function () {
-              var oInputData = {
+            var oInputData = {
                 DaysWorked: 0,
                 OptionalHoliday: 0,
                 LeaveTaken: 0,
@@ -95,9 +95,9 @@ sap.ui.define([
             // Apply the updated properties
             this.oVizFrame.setVizProperties(oVizProperties);
             this._openDB();
-          
 
-       
+
+
         },
 
         onQuarterChange: function (oEvent) {
@@ -180,7 +180,7 @@ sap.ui.define([
 
 
 
-        
+
 
 
 
@@ -231,7 +231,7 @@ sap.ui.define([
 
                 request.onsuccess = (event) => {
                     this.db = event.target.result;
-                    MessageToast.show("DB initialized successfully");
+                  //  MessageToast.show("DB initialized successfully");
                     this.onLoadFromLocalDB();
                     this.onLoadFromATHistory();
                 };
@@ -319,10 +319,15 @@ sap.ui.define([
 
 
                 //   var aHolidayList = this.getView().getModel("Holidays").getProperty("/MandatoryHolidays");
-                store.add({ "MandatoryHolidays": aHolidayList ,Key:"HOLIDAYLIST" });
+                store.add({ "MandatoryHolidays": aHolidayList, Key: "HOLIDAYLIST" });
 
 
-                tx.oncomplete = () => MessageToast.show("Saved to DB");
+                // tx.oncomplete = (event) => MessageToast.show("Saved to DB");
+                 tx.oncomplete = (event) => {
+               MessageToast.show("Data fetched Successfully");
+               this.onLoadFromLocalDB();
+
+            };
                 tx.onerror = () => MessageToast.show("Save failed");
             } catch (e) {
                 console.error(e);
@@ -337,7 +342,7 @@ sap.ui.define([
                 var data = event.target.result;
 
                 // Bind to UI5 table
-                var aHolidayList =  data.filter(item => item.Key === "HOLIDAYLIST");
+                var aHolidayList = data.filter(item => item.Key === "HOLIDAYLIST");
                 this.getView().getModel("Holidays").setProperty("/MandatoryHolidays", aHolidayList[0].MandatoryHolidays);
                 this.getView().getModel("Holidays").setProperty("/ID", aHolidayList[0].id);
 
@@ -386,15 +391,15 @@ sap.ui.define([
                 // CRITICAL: Ensure the target "id" matches your existing row exactly
                 var updatedPayload = {
                     "id": this.getView().getModel("Holidays").getProperty("/ID"),
-                    "MandatoryHolidays": this.getView().getModel("Holidays").getProperty("/MandatoryHolidays")
-
+                    "MandatoryHolidays": this.getView().getModel("Holidays").getProperty("/MandatoryHolidays"),
+                    Key: "HOLIDAYLIST"
                 };
 
                 // put() updates the existing item because the "id" already exists
                 var request = store.put(updatedPayload);
                 //     request.onsuccess = () => MessageToast.show("Data Updated successfully");
                 request.onsuccess = (event) => {
-                   // this.db = event.target.result;
+                    // this.db = event.target.result;
                     MessageToast.show("Data Updated successfully");
                     this.getView().getModel("InputModel").setProperty("/IsEditable", false);
 
@@ -408,9 +413,9 @@ sap.ui.define([
         // -------------------------------
         // IndexedDB Operations: Save, Load, Delete
         // -------------------------------
-//Attendance History for User 
- onSaveAttendanceHistory: function () {
-         
+        //Attendance History for User 
+        onSaveAttendanceHistory: function () {
+
             try {
                 if (!this.db) {
                     MessageToast.show("DB not ready");
@@ -425,7 +430,7 @@ sap.ui.define([
                 var mandatoryHolidays = this.getView().getModel("Holidays").getProperty("/MandatoryHolidays").filter(item => item.Quarter === AttendanceData.Quarter).reduce((acc, item) => acc + parseInt(item.Days, 0), 0);
                 var ototalWeekDays = this.calculateWeekdaysInQuarter(dateObj);
                 var remainingDays = AttendanceData.remainingDays
-              
+
                 var aAttendanceHistoryData = {
                     "Date": dateObj,
                     "Quarter": AttendanceData.Quarter,
@@ -435,24 +440,24 @@ sap.ui.define([
                     "OfficeBalanceDays": AttendanceData.OfficeBalanceDays,
                     "MyWorkingDays": AttendanceData.MyWorkingDays,
                     "Percentage": Math.round((AttendanceData.DaysWorked / AttendanceData.MyWorkingDays) * 100),
-                    "Key":"ATHISTORY"
+                    "Key": "ATHISTORY"
                 };
                 var request = store.add(aAttendanceHistoryData);
                 // tx.oncomplete = () => MessageToast.show("Saved to DB");
                 tx.oncomplete = (event) => {
-              
-MessageToast.show("Saved to DB");
- this.onLoadFromATHistory(); // Refresh the history list after deletion
 
-            };
-            
+                    MessageToast.show("Saved to DB");
+                    this.onLoadFromATHistory(); // Refresh the history list after deletion
+
+                };
+
                 tx.onerror = () => MessageToast.show("Save failed");
             } catch (e) {
                 console.error(e);
             }
 
         },
-         onLoadFromATHistory: function () {
+        onLoadFromATHistory: function () {
             var tx = this.db.transaction("TableData", "readonly");
             var store = tx.objectStore("TableData");
             var request = store.getAll();
@@ -461,8 +466,8 @@ MessageToast.show("Saved to DB");
                 var data = event.target.result;
 
                 // Bind to UI5 table
-                var aHistory =  data.filter(item => item.Key === "ATHISTORY");
-                    var oAttendanceHistoryModel = new sap.ui.model.json.JSONModel({ Data: aHistory });
+                var aHistory = data.filter(item => item.Key === "ATHISTORY");
+                var oAttendanceHistoryModel = new sap.ui.model.json.JSONModel({ Data: aHistory });
                 this.getView().setModel(oAttendanceHistoryModel, "AttendanceHistory");
 
 
@@ -475,7 +480,7 @@ MessageToast.show("Saved to DB");
         onUserHistoryItemPress: function (oEvent) {
             var oItem = oEvent.getSource();
             var oContext = oItem.getBindingContext("AttendanceHistory");
-          
+
             var oData = oContext.getObject();
             this.getView().getModel("InputModel").setProperty("/Date", new Date(oData.Date));
             this.getView().getModel("InputModel").setProperty("/Quarter", oData.Quarter);
@@ -500,8 +505,8 @@ MessageToast.show("Saved to DB");
             };
             request.onerror = () => {
                 MessageToast.show("Delete failed");
-            };   
-        }       
+            };
+        }
 
     });
 });
