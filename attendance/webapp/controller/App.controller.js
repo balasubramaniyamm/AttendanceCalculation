@@ -350,12 +350,12 @@ sap.ui.define([
                     this.getView().getModel("Holidays").setProperty("/ID", aHolidayList[0].id);
                 }
                 else {
-                    if(sClear){
-                    this.getView().getModel("Holidays").setProperty("/MandatoryHolidays", []);
-                }
-                else{
-                    this.onSaveToLocalDB();
-                }
+                    if (sClear) {
+                        this.getView().getModel("Holidays").setProperty("/MandatoryHolidays", []);
+                    }
+                    else {
+                        this.onSaveToLocalDB();
+                    }
                     // this.getView().getModel("Holidays").setProperty("/ID", 0);
                 }
 
@@ -529,10 +529,15 @@ sap.ui.define([
             var aColumns = [
                 { label: "Date", property: "Date", type: "string" },
                 { label: "Quarter", property: "Quarter", type: "string" },
+                { label: "MyWorkingDays", property: "MyWorkingDays", type: "string" },
                 { label: "OptionalHoliday", property: "OptionalHoliday", type: "string" },
+                { label: "MandatoryHolidays", property: "MandatoryHolidays", type: "string" },
+                { label: "LeaveTaken", property: "LeaveTaken", type: "string" },
+                { label: "OfficeBalanceDays", property: "OfficeBalanceDays", type: "string" },
                 { label: "Percentage", property: "Percentage", type: "string" },
-                { label: "OptionalHoliday", property: "OptionalHoliday", type: "string" },
-                { label: "LeaveTaken", property: "LeaveTaken", type: "string" }
+
+
+
             ];
 
 
