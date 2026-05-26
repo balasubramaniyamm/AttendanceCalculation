@@ -219,8 +219,9 @@
 }"/>
 <Text
 						text="{AttendanceHistory>Quarter}" />
-					<Text
-						text="{AttendanceHistory>Percentage} %" />
+				<ObjectNumber
+    number="{AttendanceHistory>Percentage} %"
+    state="{= ${AttendanceHistory>Percentage} >= 50 ? 'Success' : 'Warning' }" />
 						<Button icon="sap-icon://delete" type="Transparent" press="onDeleteHistoryItem"/>
 				</cells>
 			</ColumnListItem>
