@@ -29,7 +29,7 @@
                 <Title text="{i18n>AttendanceData}" />
                 <ToolbarSpacer />
                <Button text="{i18n>LoadData}"  type="Emphasized" icon="sap-icon://arrow-right" press="onLoadData" />
-			<Button press="onInitialLoad" icon="sap-icon://refresh"  ></Button>
+			<Button press="onInitialLoad" icon="sap-icon://refresh" text="{i18n>Clear}" ></Button>
 			</OverflowToolbar>
             </f:toolbar>
         
@@ -94,16 +94,19 @@
                     <viz:Popover id="idPopOver"></viz:Popover>
                 </viz:dependents>
             </viz:VizFrame>
+			
         </l:flexContent>
     </l:FixFlex>
 				<layoutData>
 					<l:SplitterLayoutData size="auto" />
 				</layoutData>
+				
 			</VBox>
 		</l:Splitter>
 <HBox>
-        <VBox class="sapUiSmallMarginBegin sapUiSmallMarginEnd">
-        	<Table id="idHolidayListTable"
+        <VBox class="sapUiSmallMarginBegin sapUiSmallMarginEnd" width="40%">
+        <ScrollContainer height="350px" vertical="true" horizontal="false">
+			<Table id="idHolidayListTable"
 		inset="false"
 		items="{
 			path: 'Holidays>/MandatoryHolidays'
@@ -122,9 +125,8 @@
 				<Label text="No of Holidays on Months"/>
 				<ToolbarSpacer ></ToolbarSpacer>
 				<Button text="Edit"  type="Emphasized" icon="sap-icon://edit" press="onEditHolidays" />
-				<Button press="onLoadFromLocalDB" text="{i18n>Refresh}"  type="Emphasized" icon="sap-icon://refresh"  />
 				<Button press="onUpdateEntry" text="{i18n>UpdateEntry}"  type="Emphasized" icon="sap-icon://save" enabled="{= !!${InputModel>/IsEditable} }"  />
-		<Button press="onSaveToLocalDB" text="{i18n>SaveToLocalDB}"  type="Emphasized" icon="sap-icon://download" enabled="{= !!${InputModel>/IsEditable} }"  />
+				<Button press="onSaveToLocalDB" text="{i18n>SaveToLocalDB}"  type="Emphasized" icon="sap-icon://download" enabled="{= !!${InputModel>/IsEditable} }"  />
 				<Button press="onDeleteFromLocalDB" text="{i18n>Delete}"  type="Emphasized" icon="sap-icon://delete" enabled="{= !!${InputModel>/IsEditable} }" />
 				
 			</OverflowToolbar>
@@ -152,14 +154,19 @@
 			</ColumnListItem>
 		</items>
 	</Table>
+	</ScrollContainer>
 	</VBox>
 
-  <VBox class="sapUiSmallMarginBegin sapUiSmallMarginEnd">
-        	<Table id="UserHistoryTable"
+  <VBox class="sapUiSmallMarginBegin sapUiSmallMarginEnd" width="60%">
+        	<ScrollContainer height="350px" vertical="true" horizontal="false">
+			<Table id="UserHistoryTable"
 		inset="false"
 		items="{
 			path: 'AttendanceHistory>/Data'
-		}">
+		}"
+		selectionChange="onUserHistoryItemPress"
+		mode = "SingleSelectMaster"
+		>
 		<headerToolbar>
 			<OverflowToolbar>
 				<content>
@@ -171,10 +178,8 @@
 		</headerToolbar>
 		<infoToolbar>
 			<OverflowToolbar>
-			<Label text="Your past attendance records will be shown here"/>
+			<Label text="Press the entry below to See Details"/>
 				<ToolbarSpacer ></ToolbarSpacer>
-					<Button text="Refresh"  type="Emphasized" icon="sap-icon://refresh" press="onLoadFromATHistory" />
-					
 			<Button text="{i18n>SaveData}"  type="Emphasized" icon="sap-icon://save" press="onSaveAttendanceHistory" />
 			<Button icon="sap-icon://excel-attachment" press="onExportExcel" text="Export to Excel" type="Emphasized" />
 			</OverflowToolbar>
@@ -188,6 +193,11 @@
 			<Column
 				minScreenWidth="Tablet"
 				demandPopin="true">
+				<Text text="Quarter" />
+			</Column>
+			<Column
+				minScreenWidth="Tablet"
+				demandPopin="true">
 				<Text text="Percentage" />
 			</Column>
 			<Column
@@ -197,7 +207,7 @@
 			</Column>
 		</columns>
 		<items>
-			<ColumnListItem vAlign="Middle" type="Navigation" press="onUserHistoryItemPress">
+			<ColumnListItem vAlign="Middle" >
 				<cells>
 					
 					<Text text="{
@@ -207,6 +217,8 @@
         pattern: 'dd-MMM-yyyy HH:mm'
     }
 }"/>
+<Text
+						text="{AttendanceHistory>Quarter}" />
 					<Text
 						text="{AttendanceHistory>Percentage} %" />
 						<Button icon="sap-icon://delete" type="Transparent" press="onDeleteHistoryItem"/>
@@ -214,6 +226,7 @@
 			</ColumnListItem>
 		</items>
 	</Table>
+	  </ScrollContainer>
 </VBox>
 	</HBox>
 </content>

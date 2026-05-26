@@ -232,7 +232,7 @@ sap.ui.define([
 
                 request.onsuccess = (event) => {
                     this.db = event.target.result;
-                  //  MessageToast.show("DB initialized successfully");
+                    //  MessageToast.show("DB initialized successfully");
                     this.onLoadFromLocalDB();
                     this.onLoadFromATHistory();
                 };
@@ -324,18 +324,18 @@ sap.ui.define([
 
 
                 // tx.oncomplete = (event) => MessageToast.show("Saved to DB");
-                 tx.oncomplete = (event) => {
-               MessageToast.show("Data fetched Successfully");
-               this.onLoadFromLocalDB();
-                this.getView().getModel("InputModel").setProperty("/IsEditable", false);
+                tx.oncomplete = (event) => {
+                    MessageToast.show("Data fetched Successfully");
+                    this.onLoadFromLocalDB();
+                    this.getView().getModel("InputModel").setProperty("/IsEditable", false);
 
-            };
+                };
                 tx.onerror = () => MessageToast.show("Save failed");
             } catch (e) {
                 console.error(e);
             }
         },
-        onLoadFromLocalDB: function () {
+        onLoadFromLocalDB: function (sClear) {
             var tx = this.db.transaction("TableData", "readonly");
             var store = tx.objectStore("TableData");
             var request = store.getAll();
@@ -345,9 +345,19 @@ sap.ui.define([
 
                 // Bind to UI5 table
                 var aHolidayList = data.filter(item => item.Key === "HOLIDAYLIST");
-                this.getView().getModel("Holidays").setProperty("/MandatoryHolidays", aHolidayList[0].MandatoryHolidays);
-                this.getView().getModel("Holidays").setProperty("/ID", aHolidayList[0].id);
-
+                if (aHolidayList.length > 0) {
+                    this.getView().getModel("Holidays").setProperty("/MandatoryHolidays", aHolidayList[0].MandatoryHolidays);
+                    this.getView().getModel("Holidays").setProperty("/ID", aHolidayList[0].id);
+                }
+                else {
+                    if(sClear){
+                    this.getView().getModel("Holidays").setProperty("/MandatoryHolidays", []);
+                }
+                else{
+                    this.onSaveToLocalDB();
+                }
+                    // this.getView().getModel("Holidays").setProperty("/ID", 0);
+                }
 
             };
 
@@ -368,8 +378,10 @@ sap.ui.define([
 
                 // var request = store.delete(id);
                 var request = store.clear();
-                request.onsuccess = function () {
+
+                request.onsuccess = () => {
                     MessageToast.show("Record Cleared successfully");
+                    this.onLoadFromLocalDB("X"); // ✅ Now 'this' correctly refers to your controller
                 };
                 request.onerror = function (event) {
                     MessageToast.show("Delete failed: " + event.target.error.name);
@@ -481,9 +493,7 @@ sap.ui.define([
         },
         onUserHistoryItemPress: function (oEvent) {
             var oItem = oEvent.getSource();
-            var oContext = oItem.getBindingContext("AttendanceHistory");
-
-            var oData = oContext.getObject();
+            var oData = oItem.getSelectedItem().getBindingContext("AttendanceHistory").getObject()
             this.getView().getModel("InputModel").setProperty("/Date", new Date(oData.Date));
             this.getView().getModel("InputModel").setProperty("/Quarter", oData.Quarter);
             this.getView().getModel("InputModel").setProperty("/OptionalHoliday", oData.OptionalHoliday);
@@ -509,22 +519,22 @@ sap.ui.define([
                 MessageToast.show("Delete failed");
             };
         },
-         onExportExcel: function () {
+        onExportExcel: function () {
             // 1. Get the table reference and its JSON model binding path
             var oTable = this.byId("UserHistoryTable");
             var oBinding = oTable.getBinding("items");
             var oModel = oTable.getModel("AttendanceHistory"); // Use your actual model name
-            
+
             // 2. Define the Excel columns matching your data properties
             var aColumns = [
                 { label: "Date", property: "Date", type: "string" },
                 { label: "Quarter", property: "Quarter", type: "string" },
                 { label: "OptionalHoliday", property: "OptionalHoliday", type: "string" },
-                 { label: "Percentage", property: "Percentage", type: "string" },
-                  { label: "OptionalHoliday", property: "OptionalHoliday", type: "string" },
-                   { label: "LeaveTaken", property: "LeaveTaken", type: "string" }
+                { label: "Percentage", property: "Percentage", type: "string" },
+                { label: "OptionalHoliday", property: "OptionalHoliday", type: "string" },
+                { label: "LeaveTaken", property: "LeaveTaken", type: "string" }
             ];
-          
+
 
             // 3. Define spreadsheet configuration settings
             var oSettings = {
